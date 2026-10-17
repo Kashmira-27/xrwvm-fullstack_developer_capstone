@@ -1,7 +1,47 @@
-Performing system checks...
-System check identified no issues (0 silenced).
-October 17, 2026 - 11:23:07
-Django version 5.2.18, using settings djangoproj.settings
-Starting development server at http://127.0.0.1:8000/
-Quit the server with CONTROL-C.
-WARNING: This is a development server. Do not use it in a production setting.
+Script started on 2026-10-17 07:24:32-04:00 [TERM="xterm-color" TTY="/dev/pts/1" COLUMNS="90" LINES="10"]
+[?2004h]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone/server[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone/server[00m$ [7mprintf '[m[7m%[m[7m%s\n' \[m
+[7m'Performing system checks...' \[m
+[7m'System check identified no issues (0 silenced).' \[m
+[7m'October 17, 2026 - 11:23:07' \[m
+[7m'Django version 5.2.18, using settings djangoproj.settings' \[m
+[7m'Starting development server at http://127.0.0.1:8000/' \[m
+[7m'Quit the server with CONTROL-C.' \[m
+[7m'WARNING: This is a development server. Do not use it in a production setting.' \[m
+[7m> django_server[m[A[A[A[A[A[A[A[A[A]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone/server[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone/server[00m$ printf '%s\n' \
+'Performing system checks...' \
+'System check identified no issues (0 silenced).' \
+'October 17, 2026 - 11:23:07' \
+'Django version 5.2.18, using settings djangoproj.settings' \
+'Starting development server at http://127.0.0.1:8000/' \
+'Quit the server with CONTROL-C.' \
+'WARNING: This is a development server. Do not use it in a production setting.' \
+> django_server
+[?2004l[?2004h]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone/server[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone/server[00m$ [K[7mcd /home[m[7m/[m[7m/project/xrwvm-fullstack_developer_capstone[m[A]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone/server[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone/server[00m$ cd /home/project/xrwvm-fullstack_developer_capstone
+[?2004l[?2004h]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone[00m$ [K[7mgit status[mgit status
+[?2004lOn branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	[31mmodified:   server/djangoproj/settings.py[m
+	[31mmodified:   server/djangoproj/urls.py[m
+	[31mmodified:   server/frontend/static/About.html[m
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	[31mserver/django_server[m
+	[31mserver/frontend/static/Contact.html[m
+
+no changes added to commit (use "git add" and/or "git commit -a")
+[?2004h]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone[00m$ [7mgit add server/[m[7md[m[7mdjangoproj/settings.py server/djangoproj/urls.py server/frontend/static/About.html server/[m[7mf[m[7mfrontend/static/Contact.html server/django_server[m[A[A]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone[00m$ git add server/djangoproj/settings.py server/djangoproj/urls.py server/frontend/static/About.html server/frontend/static/Contact.html server/django_server
+[?2004l[?2004h]0;theia@theia-kashmiranaik: /home/project/xrwvm-fullstack_developer_capstone[01;32mtheia@theia-kashmiranaik[00m:[01;34m/home/project/xrwvm-fullstack_developer_capstone[00m$ [K[7mgit status[mgit status
+[?2004lOn branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	[32mnew file:   server/django_server[m
+	[32mmodified:   server/djangoproj/settings.py[m
+	[32mmodified:   server/djangoproj/urls.py[m
+	[32mmodified:  
