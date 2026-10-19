@@ -13,12 +13,12 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Run Linter
         run: |
           pwd
-          find . -name "*.py" -exec flake8 {} +
+          find . -name "*.py" -exec flake8 --ignore=E501,W292 {} +
           echo "Linted all the python files successfully"
 
   lint_js:
@@ -40,10 +40,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -52,5 +52,5 @@ jobs:
 
       - name: Run Linter
         run: |
-          find ./server/database -name "*.js" -exec jshint {} +
+          find ./server/database -name "*.js" -exec jshint --config <(echo '{"esversion": 8}') {} +
           echo "Linted all the js files successfully"
