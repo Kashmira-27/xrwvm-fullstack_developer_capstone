@@ -1,123 +1,236 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import "./Dealers.css";
-import "../assets/style.css";
+import './Dealers.css';
+import '../assets/style.css';
 import Header from '../Header/Header';
-
 
 const PostReview = () => {
   const [dealer, setDealer] = useState({});
-  const [review, setReview] = useState("");
-  const [model, setModel] = useState();
-  const [year, setYear] = useState("");
-  const [date, setDate] = useState("");
+  const [review, setReview] = useState('');
+  const [model, setModel] = useState('');
+  const [year, setYear] = useState('');
+  const [date, setDate] = useState('');
   const [carmodels, setCarmodels] = useState([]);
 
-  let curr_url = window.location.href;
-  let root_url = curr_url.substring(0,curr_url.indexOf("postreview"));
-  let params = useParams();
-  let id =params.id;
-  let dealer_url = root_url+`djangoapp/dealer/${id}`;
-  let review_url = root_url+`djangoapp/add_review`;
-  let carmodels_url = root_url+`djangoapp/get_cars`;
+  const { id } = useParams();
 
-  const postreview = async ()=>{
-    let name = sessionStorage.getItem("firstname")+" "+sessionStorage.getItem("lastname");
-    //If the first and second name are stores as null, use the username
-    if(name.includes("null")) {
-      name = sessionStorage.getItem("username");
+  const curr_url = window.location.href;
+  const root_url = curr_url.substring(
+    0,
+    curr_url.indexOf('postreview')
+  );
+
+  const dealer_url = root_url + `djangoapp/dealer/${id}`;
+  const review_url = root_url + 'djangoapp/add_review';
+  const carmodels_url = root_url + 'djangoapp/get_cars';
+
+  // Submit the review only when the button is clicked
+  const postreview = async () => {
+    const firstName = sessionStorage.getItem('firstname');
+    const lastName = sessionStorage.getItem('lastname');
+
+    let name = `${firstName || ''} ${lastName || ''}`.trim();
+
+    if (!name) {
+      name = sessionStorage.getItem('username') || '';
     }
-    if(!model || review === "" || date === "" || year === "" || model === "") {
-      alert("All details are mandatory")
+
+    if (!model || !review.trim() || !date || !year) {
+      alert('All details are mandatory');
       return;
     }
 
-    let model_split = model.split(" ");
-    let make_chosen = model_split[0];
-    let model_chosen = model_split[1];
+    const selectedCar = carmodels.find(
+      (car) => `${car.make} ${car.model}` === model
+    );
 
-    let jsoninput = JSON.stringify({
-      "name": name,
-      "dealership": id,
-      "review": review,
-      "purchase": true,
-      "purchase_date": date,
-      "car_make": make_chosen,
-      "car_model": model_chosen,
-      "car_year": year,
-    });
-
-    console.log(jsoninput);
-    const res = await fetch(review_url, {
-      method: "POST",
-      headers: {
-          "Content-Type": "application/json",
-      },
-      body: jsoninput,
-  });
-
-  const json = await res.json();
-  if (json.status === 200) {
-      window.location.href = window.location.origin+"/dealer/"+id;
-  }
-
-  }
-  const get_dealer = async ()=>{
-    const res = await fetch(dealer_url, {
-      method: "GET"
-    });
-    const retobj = await res.json();
-    
-    if(retobj.status === 200) {
-      let dealerobjs = Array.from(retobj.dealer)
-      if(dealerobjs.length > 0)
-        setDealer(dealerobjs[0])
+    if (!selectedCar) {
+      alert('Please select a valid car.');
+      return;
     }
-  }
 
-  const get_cars = async ()=>{
-    const res = await fetch(carmodels_url, {
-      method: "GET"
-    });
-    const retobj = await res.json();
-    
-    let carmodelsarr = Array.from(retobj.CarModels)
-    setCarmodels(carmodelsarr)
-  }
+    const jsoninput = {
+      name: name,
+      dealership: id,
+      review: review,
+      purchase: true,
+      purchase_date: date,
+      car_make: selectedCar.make,
+      car_model: selectedCar.model,
+      car_year: year,
+    };
+
+    try {
+      const res = await fetch(review_url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsoninput),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert('Review posted successfully.');
+        window.location.href =
+          window.location.origin + '/dealer/' + id;
+      } else {
+        console.error('Review submission failed:', result);
+        alert('Unable to post review. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Unable to post review. Please try again.');
+    }
+  };
+
+  // Fetch dealer details
+  const get_dealer = async () => {
+    try {
+      const res = await fetch(dealer_url);
+
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch dealer details: HTTP ${res.status}`
+        );
+      }
+
+      const retobj = await res.json();
+
+      // The API returns an array of dealers
+      if (Array.isArray(retobj) && retobj.length > 0) {
+        setDealer(retobj[0]);
+      } else {
+        console.error('No dealer details found:', retobj);
+      }
+    } catch (error) {
+      console.error('Error fetching dealer:', error);
+    }
+  };
+
+  // Fetch car makes and models
+  const get_cars = async () => {
+    try {
+      const res = await fetch(carmodels_url);
+
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch cars: HTTP ${res.status}`
+        );
+      }
+
+      const retobj = await res.json();
+
+      // The API returns an array of car objects directly
+      if (Array.isArray(retobj)) {
+        const validCars = retobj.filter(
+          (car) =>
+            car &&
+            typeof car.make === 'string' &&
+            typeof car.model === 'string'
+        );
+
+        setCarmodels(validCars);
+      } else {
+        console.error('Unexpected cars API response:', retobj);
+        setCarmodels([]);
+      }
+    } catch (error) {
+      console.error('Error fetching cars:', error);
+      setCarmodels([]);
+    }
+  };
+
   useEffect(() => {
     get_dealer();
     get_cars();
-  },[]);
-
+    // Load dealer and car data when the page opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
-      <Header/>
-      <div  style={{margin:"5%"}}>
-      <h1 style={{color:"darkblue"}}>{dealer.full_name}</h1>
-      <textarea id='review' cols='50' rows='7' onChange={(e) => setReview(e.target.value)}></textarea>
-      <div className='input_field'>
-      Purchase Date <input type="date" onChange={(e) => setDate(e.target.value)}/>
-      </div>
-      <div className='input_field'>
-      Car Make 
-      <select name="cars" id="cars" onChange={(e) => setModel(e.target.value)}>
-      <option value="" selected disabled hidden>Choose Car Make and Model</option>
-      {carmodels.map(carmodel => (
-          <option value={carmodel.CarMake+" "+carmodel.CarModel}>{carmodel.CarMake} {carmodel.CarModel}</option>
-      ))}
-      </select>        
-      </div >
+      <Header />
 
-      <div className='input_field'>
-      Car Year <input type="int" onChange={(e) => setYear(e.target.value)} max={2023} min={2015}/>
-      </div>
+      <div style={{ margin: '5%' }}>
+        <h1 style={{ color: 'darkblue' }}>
+          {dealer.full_name || 'Post a Review'}
+        </h1>
 
-      <div>
-      <button className='postreview' onClick={postreview}>Post Review</button>
+        <div className="input_field">
+          <label htmlFor="review">Review</label>
+          <br />
+          <textarea
+            id="review"
+            cols="50"
+            rows="7"
+            value={review}
+            onChange={(e) => setReview(e.target.value)}
+          />
+        </div>
+
+        <div className="input_field">
+          <label htmlFor="purchaseDate">Purchase Date</label>
+          <input
+            id="purchaseDate"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+
+        <div className="input_field">
+          <label htmlFor="cars">Car Make and Model</label>
+          <select
+            name="cars"
+            id="cars"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+          >
+            <option value="" disabled>
+              Choose Car Make and Model
+            </option>
+
+            {carmodels.map((carmodel, index) => (
+              <option
+                key={`${carmodel.make}-${carmodel.model}-${index}`}
+                value={`${carmodel.make} ${carmodel.model}`}
+              >
+                {carmodel.make} {carmodel.model}
+              </option>
+            ))}
+          </select>
+
+          {carmodels.length === 0 && (
+            <p>Loading cars or no car data available.</p>
+          )}
+        </div>
+
+        <div className="input_field">
+          <label htmlFor="carYear">Car Year</label>
+          <input
+            id="carYear"
+            type="number"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            max={2026}
+            min={1900}
+          />
+        </div>
+
+        <div>
+          <button
+            type="button"
+            className="postreview"
+            onClick={postreview}
+          >
+            Post Review
+          </button>
+        </div>
       </div>
     </div>
-    </div>
-  )
-}
-export default PostReview
+  );
+};
+
+export default PostReview;

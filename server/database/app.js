@@ -19,8 +19,14 @@ const dealerships_data = JSON.parse(
   fs.readFileSync(path.join(__dirname, 'data', 'dealerships.json'), 'utf8')
 );
 
+// Load car makes and models
+// Corrected filename: car_records.json
+const cars_data = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'data', 'car_records.json'), 'utf8')
+);
+
 // Connect to MongoDB
-mongoose.connect('mongodb://mongo_db:27017/', {
+mongoose.connect('mongodb://127.0.0.1:27017/', {
   dbName: 'dealershipsDB'
 });
 
@@ -47,13 +53,38 @@ app.get('/', async (req, res) => {
   res.send('Welcome to the Mongoose API');
 });
 
+// Fetch car makes and models
+app.get('/get_cars', (req, res) => {
+  try {
+    // Support either an array or an object containing a cars array
+    const cars = Array.isArray(cars_data)
+      ? cars_data
+      : cars_data.cars;
+
+    if (!Array.isArray(cars)) {
+      return res.status(500).json({
+        error: 'Invalid car data format'
+      });
+    }
+
+    res.json(cars);
+  } catch (error) {
+    console.error('Error fetching cars:', error);
+    res.status(500).json({
+      error: 'Error fetching cars'
+    });
+  }
+});
+
 // Fetch all reviews
 app.get('/fetchReviews', async (req, res) => {
   try {
     const documents = await Reviews.find();
     res.json(documents);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
+    res.status(500).json({
+      error: 'Error fetching documents'
+    });
   }
 });
 
@@ -66,7 +97,9 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 
     res.json(documents);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
+    res.status(500).json({
+      error: 'Error fetching documents'
+    });
   }
 });
 
@@ -76,7 +109,9 @@ app.get('/fetchDealers', async (req, res) => {
     const documents = await Dealerships.find();
     res.json(documents);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching dealerships' });
+    res.status(500).json({
+      error: 'Error fetching dealerships'
+    });
   }
 });
 
@@ -84,7 +119,10 @@ app.get('/fetchDealers', async (req, res) => {
 app.get('/fetchDealers/:state', async (req, res) => {
   try {
     const documents = await Dealerships.find({
-      state: { $regex: `^${req.params.state}$`, $options: 'i' }
+      state: {
+        $regex: `^${req.params.state}$`,
+        $options: 'i'
+      }
     });
 
     res.json(documents);
@@ -111,32 +149,43 @@ app.get('/fetchDealer/:id', async (req, res) => {
 });
 
 // Insert a review
-app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
-  try {
-    const data = JSON.parse(req.body.toString());
+app.post(
+  '/insert_review',
+  express.raw({ type: '*/*' }),
+  async (req, res) => {
+    try {
+      const data = JSON.parse(req.body.toString());
 
-    const documents = await Reviews.find().sort({ id: -1 }).limit(1);
-    const new_id = documents.length > 0 ? documents[0].id + 1 : 1;
+      const documents = await Reviews.find()
+        .sort({ id: -1 })
+        .limit(1);
 
-    const review = new Reviews({
-      id: new_id,
-      name: data.name,
-      dealership: data.dealership,
-      review: data.review,
-      purchase: data.purchase,
-      purchase_date: data.purchase_date,
-      car_make: data.car_make,
-      car_model: data.car_model,
-      car_year: data.car_year
-    });
+      const new_id = documents.length > 0
+        ? documents[0].id + 1
+        : 1;
 
-    const savedReview = await review.save();
-    res.json(savedReview);
-  } catch (error) {
-    console.error('Error inserting review:', error);
-    res.status(500).json({ error: 'Error inserting review' });
+      const review = new Reviews({
+        id: new_id,
+        name: data.name,
+        dealership: data.dealership,
+        review: data.review,
+        purchase: data.purchase,
+        purchase_date: data.purchase_date,
+        car_make: data.car_make,
+        car_model: data.car_model,
+        car_year: data.car_year
+      });
+
+      const savedReview = await review.save();
+      res.json(savedReview);
+    } catch (error) {
+      console.error('Error inserting review:', error);
+      res.status(500).json({
+        error: 'Error inserting review'
+      });
+    }
   }
-});
+);
 
 // Start the Express server
 app.listen(port, () => {
