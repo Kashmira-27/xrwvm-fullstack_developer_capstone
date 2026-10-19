@@ -85,7 +85,12 @@ def registration(request):
 
 
 def get_dealerships(request, state="All"):
-    endpoint = "/fetchDealers" if state == "All" else f"/fetchDealers/{state}"
+    endpoint = (
+        "/fetchDealers"
+        if state == "All"
+        else f"/fetchDealers/{state}"
+    )
+
     dealerships = get_request(endpoint)
 
     if dealerships is None:
@@ -125,6 +130,19 @@ def get_dealer_reviews(request, dealer_id):
                 review["sentiment"] = analyze_review_sentiments(text)
 
     return JsonResponse(reviews, safe=False)
+
+
+# Fetch car makes and models
+def get_cars(request):
+    cars = get_request("/get_cars")
+
+    if cars is None:
+        return JsonResponse(
+            {"error": "Unable to fetch car makes and models"},
+            status=502
+        )
+
+    return JsonResponse(cars, safe=False)
 
 
 @csrf_exempt
