@@ -20,7 +20,7 @@ const dealerships_data = JSON.parse(
 );
 
 // Connect to MongoDB
-mongoose.connect('mongodb://mongo_db:27017/', {
+mongoose.connect('mongodb://mongo-db:27017/', {
   dbName: 'dealershipsDB'
 });
 
@@ -45,6 +45,40 @@ mongoose.connection.once('open', async () => {
 // Home endpoint
 app.get('/', async (req, res) => {
   res.send('Welcome to the Mongoose API');
+});
+
+// Fetch car makes and models
+app.get('/get_cars', (req, res) => {
+  try {
+    const carsData = JSON.parse(
+      fs.readFileSync(
+        path.join(__dirname, 'data', 'car_records.json'),
+        'utf8'
+      )
+    );
+
+    const uniqueCars = new Map();
+
+    carsData.cars.forEach((car) => {
+      const key = `${car.make}|${car.model}`;
+
+      if (!uniqueCars.has(key)) {
+        uniqueCars.set(key, {
+          CarMake: car.make,
+          CarModel: car.model
+        });
+      }
+    });
+
+    res.json({
+      CarModels: Array.from(uniqueCars.values())
+    });
+  } catch (error) {
+    console.error('Error fetching car makes and models:', error);
+    res.status(500).json({
+      error: 'Error fetching car makes and models'
+    });
+  }
 });
 
 // Fetch all reviews
